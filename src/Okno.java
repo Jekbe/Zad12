@@ -1,11 +1,15 @@
 import javax.swing.*;
 import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Okno extends JFrame {
 
-    JLabel lbImie, lbNazwisko, lbWzrost, lbWaga, wynik;
+    JLabel lbImie, lbNazwisko, lbWzrost, lbWaga, lbwynik, lbprawidlowe;
     JTextField tfImie, tfNazwisko, tfWzrost, tfWaga;
-    JButton bZatwierdz;
+    JButton bZatwierdz, bZamknij;
+    private final List<Osoba> osoby = new ArrayList<>();
+    private int prawidlowe = 0;
     public Okno(){
         setSize(650, 400);
         setLayout(new FlowLayout());
@@ -26,6 +30,7 @@ public class Okno extends JFrame {
         add(lbWaga = new JLabel("Waga:"));
         add(tfWaga = new JTextField(3));
         add(bZatwierdz = new JButton("Zatwierdź"));
+        add(bZamknij = new JButton("Zamknij"));
 
         listener();
     }
@@ -36,17 +41,28 @@ public class Okno extends JFrame {
             revalidate();
             repaint();
         });
+
+        bZamknij.addActionListener(e -> System.exit(0));
     }
 
     private void dodajOsobe(){
         try{
-            Osoba o1 = new Osoba(tfImie.getText(), tfNazwisko.getText(), Integer.parseInt(tfWzrost.getText()),
+            Osoba osoba = new Osoba(tfImie.getText(), tfNazwisko.getText(), Integer.parseInt(tfWzrost.getText()),
                     Integer.parseInt(tfWaga.getText()));
-            wynik = new JLabel(o1.wypiszDane());
-            JOptionPane.showMessageDialog(null, o1.wypiszDane());
-            add(wynik);
+            osoby.add(osoba);
+
+            if (lbwynik == null) add(lbwynik = new JLabel(osoba.wypiszDane()));
+            else lbwynik.setText(osoba.wypiszDane());
+            JOptionPane.showMessageDialog(null, osoba.wypiszDane());
+            prawidlowe();
         } catch (NumberFormatException exp){
-            System.out.println("Błąd: " + exp);
+            JOptionPane.showMessageDialog(null, "błąd: " + exp);
         }
+    }
+
+    private void prawidlowe(){
+        for (Osoba osoba : osoby) if (osoba.bmi() > 25 && osoba.bmi() < 29.9) prawidlowe++;
+        if (lbprawidlowe == null) add(lbprawidlowe = new JLabel("Ile osób z poprawnym wzrostem: " + prawidlowe));
+        else lbprawidlowe.setText("Ile osób z poprawnym wzrostem: " + prawidlowe);
     }
 }
